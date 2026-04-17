@@ -3,6 +3,8 @@ from . auth import get_current_user
 from contextlib import asynccontextmanager
 from .database import engine, Base
 from .routes import users, auth, transactions
+from fastapi.staticfiles import StaticFiles
+import os
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -19,6 +21,11 @@ async def teste_logado(user = Depends(get_current_user)):
 @app.get("/")
 async def read_root():
     return{"status": "API Async rodando no MySQL porta 3008"}
+
+if not os.path.exists("profile_pics"):
+    os.makedirs("profile_pics")
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.include_router(users.router)
 app.include_router(auth.router)
