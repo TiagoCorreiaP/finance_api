@@ -29,7 +29,6 @@ class TransactionCreate(TransactionsBase):
     amount: float
     type: str
     category: str
-    interest: Optional[float] = 0.0
 
 class TransactionResponse(TransactionsBase):
     id: int
