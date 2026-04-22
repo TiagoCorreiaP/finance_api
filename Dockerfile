@@ -1,17 +1,18 @@
-# Usa uma imagem leve do Python
 FROM python:3.10-slim
 
-# Define o diretório de trabalho dentro do container
-WORKDIR /code
+WORKDIR /app
 
-# Copia o arquivo de dependências
-COPY ./requirements.txt /code/requirements.txt
+RUN apt-get update && apt-get install -y \
+    gcc \
+    python3-dev \
+    default-libmysqlclient-dev \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
 
-# Instala as dependências
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+COPY requirements.txt .
 
-# Copia o restante do código da pasta app
-COPY ./app /code/app
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
-# Comando para rodar a aplicação
+COPY . .
+
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

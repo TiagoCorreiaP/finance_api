@@ -1,27 +1,39 @@
 version: '3.8'
 
 services:
+
   db:
-    image: mysql:latest
-    container_name: mysql-financas
+    image: mysql:8.0
+    container_name: finance_db_container
     restart: always
     environment:
+      MYSQL_DATABASE: finance_db
       MYSQL_ROOT_PASSWORD: tiago.correia
-      MYSQL_DATABASE: db_financas
     ports:
       - "3308:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-ptiago.correia"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   api:
     build: .
-    container_name: finance-fastapi
+    container_name: finance_api_container
+    restart: always
     ports:
       - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
     env_file:
       - .env
-    depends_on:
-      - db
+    volumes:
+      - .:/app
+      - ./static:/app/static
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
 volumes:
   mysql_data:

@@ -4,6 +4,12 @@ from . import models, schemas, auth
 from fastapi import UploadFile
 import os
 import shutil
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from io import BytesIO
+
 
 async def get_user_by_email(db: AsyncSession, email: str):
     result = await db.execute(select(models.User).filter(models.User.email == email))
@@ -145,3 +151,78 @@ async def save_profile_picture(db: AsyncSession, user: models.User, file: Upload
     await db.refresh(user)
 
     return user.profile_picture
+
+
+async def generate_transactions_pdf(db: AsyncSession, user_id: int):
+    result = await db.execute(
+        select(models.Transaction).where(models.Transaction.owner_id == user_id)
+    )
+    transactions = result.scalars().all()
+
+    total_entradas = 0.0
+    total_saidas = 0.0
+
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4)
+    elements = []
+    styles = getSampleStyleSheet()
+
+    elements.append(Paragraph("Extrato Financeiro", styles['Title']))
+    elements.append(Spacer(1, 20))
+
+    data = [["Data", "Descrição", "Valor", "Tipo", "Categoria"]]
+    for t in transactions:
+        valor = float(t.amount)
+        tipo = str(t.type).lower()
+        
+        if tipo == "entrada":
+            total_entradas += valor
+        else:
+            total_saidas += valor
+
+        data.append([
+            t.date.strftime("%d/%m/%Y") if t.date else "",
+            str(t.description),
+            f"R$ {valor:.2f}",
+            tipo.capitalize(),
+            str(t.category)
+        ])
+
+    table = Table(data, colWidths=[70, 180, 80, 70, 90])
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.dodgerblue),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+    ]))
+    elements.append(table)
+    
+    elements.append(Spacer(1, 30))
+    elements.append(Paragraph("Resumo do Período", styles['Heading2']))
+    elements.append(Spacer(1, 10))
+
+    saldo_final = total_entradas - total_saidas
+    cor_saldo = colors.green if saldo_final >= 0 else colors.red
+
+    summary_data = [
+        ["Total de Entradas:", f"R$ {total_entradas:.2f}"],
+        ["Total de Saídas:", f"R$ {total_saidas:.2f}"],
+        ["Saldo Final:", f"R$ {saldo_final:.2f}"]
+    ]
+
+    summary_table = Table(summary_data, colWidths=[150, 100])
+    summary_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 1), (0, 2), 'Helvetica-Bold'),
+        ('TEXTCOLOR', (1, 2), (1, 2), cor_saldo),
+        ('LINEABOVE', (0, 2), (1, 2), 1, colors.black),
+    ]))
+    
+    elements.append(summary_table)
+
+
+    doc.build(elements)
+    pdf_content = buffer.getvalue()
+    buffer.close()
+    return pdf_content

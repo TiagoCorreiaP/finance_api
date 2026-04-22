@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from typing import List
@@ -50,3 +50,23 @@ async def delete_transaction(transaction_id: int, db: AsyncSession = Depends(dat
     if not success:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transação não encontrada ou não pertence ao usuário")
     return{"detail": "Transação deletada com sucesso"}
+
+@router.get("/export/pdf")
+async def export_transactions_pdf(
+    db: AsyncSession = Depends(database.get_db),
+    current_user: models.User = Depends(auth.get_current_user)
+):
+    try:
+        pdf_data = await crud.generate_transactions_pdf(db, current_user.id)
+        
+        return Response(
+            content=pdf_data,
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f"attachment; filename=extrato_{current_user.id}.pdf",
+                "Access-Control-Expose-Headers": "Content-Disposition"
+            }
+        )
+    except Exception as e:
+        print(f"Erro: {e}") # Log para debug
+        raise HTTPException(status_code=500, detail="Erro ao gerar PDF.")

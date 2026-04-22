@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from .database import engine, Base
 from .routes import users, auth, transactions
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 import os
 
 @asynccontextmanager
@@ -13,6 +14,14 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(title="Finance API Async", lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/teste_logado")
 async def teste_logado(user = Depends(get_current_user)):
