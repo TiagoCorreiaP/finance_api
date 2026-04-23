@@ -22,7 +22,6 @@ class TransactionsBase(BaseModel):
     amount: float
     type: str
     category: str
-    interest:  Optional[float] = 0.0
 
 class TransactionCreate(TransactionsBase):
     description: str
