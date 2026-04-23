@@ -9,7 +9,6 @@ from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from io import BytesIO
-from sqlalchemy.orm import Session
 from sqlalchemy import delete
 
 
