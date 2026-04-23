@@ -9,6 +9,8 @@ from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from io import BytesIO
+from sqlalchemy.orm import Session
+from sqlalchemy import delete
 
 
 async def get_user_by_email(db: AsyncSession, email: str):
@@ -226,3 +228,14 @@ async def generate_transactions_pdf(db: AsyncSession, user_id: int):
     pdf_content = buffer.getvalue()
     buffer.close()
     return pdf_content
+
+
+async def delete_all_transactions(db: AsyncSession):
+    try:
+        smtm = delete(models.Transaction)
+        await db.execute(smtm)
+        await db.commit()
+        return True
+    except Exception as e:
+        await db.rollback()
+        raise e

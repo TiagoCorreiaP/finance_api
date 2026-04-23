@@ -44,6 +44,13 @@ async def get_finance_health(db: AsyncSession = Depends(database.get_db), curren
 async def get_top_expenses(db: AsyncSession = Depends(database.get_db), current_user: models.User = Depends(auth.get_current_user)):
     return await crud.get_top_expenses(db, user_id=current_user.id)
 
+@router.delete("/transactions/delete-all")
+async def clear_transactions(db: AsyncSession = Depends(database.get_db), current_user: models.User = Depends(auth.get_current_user)):
+    success = await crud.delete_all_transactions(db)
+    if not success:
+        raise HTTPException(status_code=500, detail="Erro ao deletar transações")
+    return {"detail": "Todas as transações foram deletadas com sucesso"}
+
 @router.delete("/{transaction_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_transaction(transaction_id: int, db: AsyncSession = Depends(database.get_db), current_user: models.User = Depends(auth.get_current_user)):
     success = await crud.delete_transaction(db, transaction_id, user_id=current_user.id)
