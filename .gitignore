@@ -1,7 +1,5 @@
 venv/
 .venv/
-env/
-ENV/
 bin/
 lib/
 include/
@@ -13,7 +11,6 @@ __pycache__/
 *.sqlite3
 *.db
 
-.env
 .flaskenv
 
 .vscode/
