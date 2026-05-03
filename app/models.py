@@ -12,6 +12,7 @@ class User(Base):
     hashed_password = Column(String(255))
 
     profile_picture = Column(String(255), nullable=True)
+    profile_picture_url = Column(String(500), nullable=True)
     phone = Column(String(20), nullable=True)
     birth_date = Column(Date, nullable=True)
 

@@ -37,3 +37,17 @@ async def upload_profile_photo(file: UploadFile = File(...), db: AsyncSession = 
     photo_url = await crud.save_profile_picture(db, current_user, file)
 
     return{"url": photo_url}    
+
+@router.get("/profile-picture-url")
+async def update_profile_picture_url(
+    data: schemas.ProfilePictureUpdate,
+    db: AsyncSession = Depends(database.get_db),
+    current_user: models.User = Depends(auth.get_current_user)
+):
+    # Atualiza o campo no objeto do usuário logado
+    current_user.profile_picture_url = data.url
+    
+    await db.commit()
+    await db.refresh(current_user)
+    
+    return {"message": "Foto de perfil atualizada com sucesso!", "url": current_user.profile_picture_url}
