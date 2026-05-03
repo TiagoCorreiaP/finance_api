@@ -17,8 +17,6 @@ class UserResponse(BaseModel):
     class Config:
         from_attributes = True
 
-class ProfilePictureUpdate(BaseModel):
-    url: str
 
 class TransactionsBase(BaseModel):
     description: str

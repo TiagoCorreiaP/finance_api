@@ -153,6 +153,14 @@ async def save_profile_picture(db: AsyncSession, user: models.User, file: Upload
 
     return user.profile_picture
 
+async def save_profile_picture_url(db: AsyncSession, user: models.User, url: str):
+    
+    user.profile_picture_url = url
+    await db.commit()
+    await db.refresh(user)
+
+    return user.profile_picture_url
+
 
 async def generate_transactions_pdf(db: AsyncSession, user_id: int):
     result = await db.execute(
