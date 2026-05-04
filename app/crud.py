@@ -72,7 +72,7 @@ async def get_finance_health(db: AsyncSession, user_id: int):
     if income == 0:
         return{"status": "Sem dados", "ratio": 0}
     
-    ratio = (income / expense) * 100
+    ratio = (expense / income) * 100
 
     if ratio < 50:
         msg  = "Saúde excelente! Você está economizando."
@@ -82,7 +82,7 @@ async def get_finance_health(db: AsyncSession, user_id: int):
         msg = "Alerta! Você está gastando quase tudo (ou mais) do que ganha."
 
     return {
-        "porcentagem_gastos": round(ratio, 2),
+        "porcentagem_gastos": f"{round(ratio, 2)}%",
         "status": msg,
         "sugestao": "Tende manter seus gastos abaixo de 70% da sua renda para uma saúde financeira mais equilibrada."
     }
