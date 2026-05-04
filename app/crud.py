@@ -237,12 +237,34 @@ async def generate_transactions_pdf(db: AsyncSession, user_id: int):
     return pdf_content
 
 
-async def delete_all_transactions(db: AsyncSession):
+async def delete_all_transactions(db: AsyncSession, user: models.User):
     try:
-        smtm = delete(models.Transaction)
+        smtm = delete(models.Transaction).where(
+            models.Transaction.owner_id == user.id
+        )
         await db.execute(smtm)
         await db.commit()
         return True
     except Exception as e:
         await db.rollback()
         raise e
+
+async def update_transaction(db: AsyncSession, transaction_id: int, user_id: int, transaction_data: schemas.TransactionCreate):
+    result = await db.execute(
+        select(models.Transaction).filter(
+            models.Transaction.id == transaction_id, 
+            models.Transaction.owner_id == user_id
+        )
+    )
+    db_transaction = result.scalar_one_or_none()
+
+    if db_transaction:
+        update_data = transaction_data.dict(exclude_unset=True)
+        for key, value in update_data.items():
+            setattr(db_transaction, key, value)
+        
+        await db.commit()
+        await db.refresh(db_transaction)
+        return db_transaction
+        
+    return None

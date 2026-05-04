@@ -4,7 +4,8 @@ from sqlalchemy.future import select
 from typing import List
 from .. import crud, schemas, database, auth, models
 
-router = APIRouter(prefix="/transactions", tags=["transactions"])
+router = APIRouter(prefix="/transactions", tags=["transactions"]
+                   )
 
 @router.post("/", response_model=schemas.TransactionResponse)
 async def create_new_transaction(
@@ -46,7 +47,7 @@ async def get_top_expenses(db: AsyncSession = Depends(database.get_db), current_
 
 @router.delete("/transactions/delete-all")
 async def clear_transactions(db: AsyncSession = Depends(database.get_db), current_user: models.User = Depends(auth.get_current_user)):
-    success = await crud.delete_all_transactions(db)
+    success = await crud.delete_all_transactions(db, current_user)
     if not success:
         raise HTTPException(status_code=500, detail="Erro ao deletar transações")
     return {"detail": "Todas as transações foram deletadas com sucesso"}
@@ -57,6 +58,22 @@ async def delete_transaction(transaction_id: int, db: AsyncSession = Depends(dat
     if not success:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transação não encontrada ou não pertence ao usuário")
     return{"detail": "Transação deletada com sucesso"}
+
+@router.put("/transactions/{transaction_id}", response_model=schemas.TransactionResponse)
+async def edit_transaction(
+    transaction_id: int,
+    transaction_data: schemas.TransactionCreate,
+    db: AsyncSession = Depends(database.get_db),
+    current_user: models.User = Depends(auth.get_current_user)
+):
+    updated_transaction = await crud.update_transaction(
+        db, transaction_id, current_user.id, transaction_data
+    )
+    
+    if updated_transaction is None:
+        raise HTTPException(status_code=404, detail="Transação não encontrada ou acesso negado")
+        
+    return updated_transaction
 
 @router.get("/export/pdf")
 async def export_transactions_pdf(
@@ -75,5 +92,5 @@ async def export_transactions_pdf(
             }
         )
     except Exception as e:
-        print(f"Erro: {e}") # Log para debug
+        print(f"Erro: {e}") 
         raise HTTPException(status_code=500, detail="Erro ao gerar PDF.")
