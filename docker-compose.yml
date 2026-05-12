@@ -35,5 +35,13 @@ services:
       - ./static:/app/static
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
+  web-cadastro:
+    build: ./web-cadastro
+    container_name: finance_web_container 
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+
 volumes:
   mysql_data:
