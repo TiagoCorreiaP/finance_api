@@ -24,7 +24,7 @@ services:
     container_name: finance_api_container
     restart: always
     ports:
-      - "8000:8000"
+      - "9999:9999"
     depends_on:
       db:
         condition: service_healthy
@@ -33,13 +33,13 @@ services:
     volumes:
       - .:/app
       - ./static:/app/static
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    command: uvicorn app.main:app --host 0.0.0.0 --port 9999 --reload
 
   web-cadastro:
     build: ./web-cadastro
     container_name: finance_web_container 
     ports:
-      - "3000:80"
+      - "7584:57"
     depends_on:
       - api
 

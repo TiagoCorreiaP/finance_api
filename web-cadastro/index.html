@@ -3,79 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro de Usuário</title>
-    <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; padding: 50px; background: #f4f4f4; }
-        form { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 300px; }
-        div { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; }
-        input { width: 100%; padding: 8px; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        button:hover { background: #0056b3; }
-    </style>
+    <title>PLANOB    | Cadastro Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<form id="registerForm">
-    <h2>Criar Conta</h2>
-    <div>
+    <div class="container">
+        <form id="registerForm" class="card">
+    <div class="brand">
+        <i class="fa-solid fa-wallet"></i>
+        <h2>Finance<span>API</span></h2>
+    </div>
+    <p class="subtitle">Crie sua conta para liberar o acesso</p>
+
+    <div class="input-group">
         <label>Nome Completo</label>
         <input type="text" id="full_name" required>
     </div>
-    <div>
+    <div class="input-group">
         <label>E-mail</label>
         <input type="email" id="email" required>
     </div>
-    <div>
+    <div class="input-group">
         <label>Senha</label>
         <input type="password" id="password" required>
     </div>
-    <div>
-        <label>Telefone</label>
-        <input type="text" id="phone" placeholder="(00) 00000-0000">
+    <div class="input-row">
+        <div class="input-group">
+            <label>Telefone</label>
+            <input type="text" id="phone">
+        </div>
+        <div class="input-group">
+            <label>Nascimento</label>
+            <input type="date" id="birth_date">
+        </div>
     </div>
-    <div>
-        <label>Data de Nascimento</label>
-        <input type="date" id="birth_date">
-    </div>
-    <button type="submit">Cadastrar</button>
+    <button type="submit" class="btn-primary" id="submitBtn">Finalizar Cadastro</button>
 </form>
 
+<div id="successArea" class="card hidden">
+    <h2>✅ Sucesso!</h2>
+    <p>Agora você pode baixar o arquivo.</p>
+    <a href="#" class="btn-download">Baixar .EXE</a>
+</div>
+
 <script>
-    const form = document.getElementById('registerForm');
+    // Usamos window.onload pra garantir que o formulário já existe na tela
+    window.onload = function() {
+        const form = document.getElementById('registerForm');
+        const successArea = document.getElementById('successArea');
 
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        // Montando o objeto seguindo o seu schemas.UserCreate
-        const payload = {
-            full_name: document.getElementById('full_name').value,
-            email: document.getElementById('email').value,
-            password: document.getElementById('password').value,
-            phone: document.getElementById('phone').value,
-            birth_date: document.getElementById('birth_date').value
-        };
-
-        try {
-            const response = await fetch('http://localhost:8000/users', { // Ajuste a rota se necessário
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            if (response.ok) {
-                alert('Usuário cadastrado com sucesso!');
-                form.reset();
-            } else {
-                const errorData = await response.json();
-                alert('Erro: ' + JSON.stringify(errorData.detail));
-            }
-        } catch (error) {
-            console.error('Erro na requisição:', error);
-            alert('Não foi possível conectar à API. Verifique o CORS.');
+        if (!form) {
+            console.error("Mano, o JS não achou o formulário 'registerForm'!");
+            return;
         }
-    });
-</script>
 
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            console.log("Botão clicado! Preparando dados...");
+
+            const payload = {
+                full_name: document.getElementById('full_name').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                phone: document.getElementById('phone').value || "",
+                birth_date: document.getElementById('birth_date').value || null
+            };
+
+            try {
+                // Tenta enviar para a porta 9999
+                const response = await fetch('http://localhost:9999/users', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    console.log("API respondeu OK!");
+                    form.classList.add('hidden');
+                    successArea.classList.remove('hidden');
+                    successArea.style.display = 'block'; // Força o aparecimento
+                } else {
+                    const error = await response.json();
+                    console.error("A API recusou:", error);
+                    alert("Erro na API: " + JSON.stringify(error.detail));
+                }
+            } catch (err) {
+                console.error("Erro fatal de conexão:", err);
+                alert("Não conectou na API. O Docker está rodando na porta 9999?");
+            }
+        });
+    };
+</script>
 </body>
 </html>
