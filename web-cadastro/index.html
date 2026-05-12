@@ -46,7 +46,7 @@
 <div id="successArea" class="card hidden">
     <h2>✅ Sucesso!</h2>
     <p>Agora você pode baixar o arquivo.</p>
-    <a href="#" class="btn-download">Baixar .EXE</a>
+    <a href="#" class="btn-download">Baixar PLANOB</a>
 </div>
 
 <script>
@@ -87,7 +87,7 @@
                 } else {
                     const error = await response.json();
                     console.error("A API recusou:", error);
-                    alert("Erro na API: " + JSON.stringify(error.detail));
+                    alert("Formato de Email inválido!");
                 }
             } catch (err) {
                 console.error("Erro fatal de conexão:", err);
