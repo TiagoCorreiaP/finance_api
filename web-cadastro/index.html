@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PLANOB    | Cadastro Pro</title>
+    <title>PLANOB | Cadastro</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
@@ -14,7 +14,7 @@
         <form id="registerForm" class="card">
     <div class="brand">
         <i class="fa-solid fa-wallet"></i>
-        <h2>Finance<span>API</span></h2>
+        <h2>PLANO<span>B</span></h2>
     </div>
     <p class="subtitle">Crie sua conta para liberar o acesso</p>
 
@@ -50,7 +50,6 @@
 </div>
 
 <script>
-    // Usamos window.onload pra garantir que o formulário já existe na tela
     window.onload = function() {
         const form = document.getElementById('registerForm');
         const successArea = document.getElementById('successArea');
@@ -73,7 +72,7 @@
             };
 
             try {
-                // Tenta enviar para a porta 9999
+
                 const response = await fetch('http://localhost:9999/users', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -84,7 +83,7 @@
                     console.log("API respondeu OK!");
                     form.classList.add('hidden');
                     successArea.classList.remove('hidden');
-                    successArea.style.display = 'block'; // Força o aparecimento
+                    successArea.style.display = 'block'; 
                 } else {
                     const error = await response.json();
                     console.error("A API recusou:", error);

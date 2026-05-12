@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        // Feedback visual no botão
+
         const btn = form.querySelector('button');
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processando...';
         btn.disabled = true;
@@ -31,10 +31,10 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (response.ok) {
-                // A MÁGICA AQUI: Remove a classe que esconde e adiciona a que mostra
+
                 form.classList.add('hidden'); 
                 successArea.classList.remove('hidden');
-                // Garante que o display não bloqueie
+
                 successArea.style.display = 'block'; 
             } else {
                 const errorData = await response.json();

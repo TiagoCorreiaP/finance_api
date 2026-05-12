@@ -109,7 +109,7 @@ input:focus {
     box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
 }
 
-/* Botão de Cadastro "Mídia" */
+
 .btn-primary { 
     width: 100%; 
     padding: 18px; 
@@ -135,10 +135,10 @@ input:focus {
     filter: brightness(1.1);
 }
 
-/* Classe de controle - CRÍTICO */
+
 .hidden { display: none !important; }
 
-/* Tela de Sucesso */
+
 #successArea { text-align: center; }
 
 .success-icon {
