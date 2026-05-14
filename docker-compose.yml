@@ -39,7 +39,7 @@ services:
     build: ./web-cadastro
     container_name: finance_web_container 
     ports:
-      - "7584:57"
+      - "8080:3000"
     depends_on:
       - api
 
